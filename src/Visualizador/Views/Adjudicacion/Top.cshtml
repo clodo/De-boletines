@@ -1,0 +1,196 @@
+﻿@using Extractor.Model.Entity
+@model IEnumerable<Extractor.Model.Entity.Adjudicacion>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<link rel="stylesheet" type="text/css" href="http://dev.sencha.com/deploy/ext-4.0.0/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="http://dev.sencha.com/deploy/ext-4.0.0/examples/shared/example.css" />
+<script type="text/javascript" src="http://dev.sencha.com/deploy/ext-4.0.0/bootstrap.js"></script>
+<script type="text/javascript">
+    Ext.require(['Ext.data.*']);
+
+    Ext.onReady(function () {
+
+        window.generateData = function (n, floor) {
+            var data = [],
+            p = (Math.random() * 11) + 1,
+            i;
+
+            floor = (!floor && floor !== 0) ? 20 : floor;
+
+            @foreach(Adjudicacion adjudication in Model) {
+                <text>
+                data.push({
+                    name: '@((adjudication.Entidad + "                              ").Substring(0, 20))',
+                    data1: @((int) adjudication.Precio)
+                });
+                </text>
+            }
+            return data;
+        };
+
+        window.generateDataNegative = function (n, floor) {
+            var data = [],
+            p = (Math.random() * 11) + 1,
+            i;
+
+            floor = (!floor && floor !== 0) ? 20 : floor;
+
+            for (i = 0; i < (n || 12); i++) {
+                data.push({
+                    name: Ext.Date.monthNames[i % 12],
+                    data1: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data2: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data3: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data4: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data5: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data6: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data7: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data8: Math.floor(((Math.random() - 0.5) * 100), floor),
+                    data9: Math.floor(((Math.random() - 0.5) * 100), floor)
+                });
+            }
+            return data;
+        };
+
+        window.store1 = Ext.create('Ext.data.JsonStore', {
+            fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5', 'data6', 'data7', 'data9', 'data9'],
+            data: generateData()
+        });
+        window.storeNegatives = Ext.create('Ext.data.JsonStore', {
+            fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5', 'data6', 'data7', 'data9', 'data9'],
+            data: generateDataNegative()
+        });
+        window.store3 = Ext.create('Ext.data.JsonStore', {
+            fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5', 'data6', 'data7', 'data9', 'data9'],
+            data: generateData()
+        });
+        window.store4 = Ext.create('Ext.data.JsonStore', {
+            fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5', 'data6', 'data7', 'data9', 'data9'],
+            data: generateData()
+        });
+        window.store5 = Ext.create('Ext.data.JsonStore', {
+            fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5', 'data6', 'data7', 'data9', 'data9'],
+            data: generateData()
+        });
+
+
+    });
+</script>
+<script type="text/javascript">
+    Ext.require('Ext.chart.*');
+    Ext.require(['Ext.Window', 'Ext.fx.target.Sprite', 'Ext.layout.container.Fit']);
+
+    Ext.onReady(function () {
+        Ext.chart.theme.White = Ext.extend(Ext.chart.theme.Base, {
+            constructor: function () {
+                Ext.chart.theme.White.superclass.constructor.call(this, {
+                    axis: {
+                        stroke: 'rgb(8,69,148)',
+                        'stroke-width': 1
+                    },
+                    axisLabel: {
+                        fill: 'rgb(8,69,148)',
+                        font: '12px Arial',
+                        'font-family': '"Arial',
+                        spacing: 2,
+                        padding: 5,
+                        renderer: function (v) { return v; }
+                    },
+                    axisTitle: {
+                        font: 'bold 18px Arial'
+                    }
+                });
+            }
+        });
+
+        var win = Ext.create('Ext.Window', {
+            width: 800,
+            height: 600,
+            hidden: false,
+            maximizable: true,
+            title: 'Bar Chart',
+            renderTo: Ext.getBody(),
+            layout: 'fit',
+            tbar: [{
+                text: 'Reload Data',
+                handler: function () {
+                    store1.loadData(generateData());
+                }
+            }],
+            items: {
+                id: 'chartCmp',
+                xtype: 'chart',
+                animate: true,
+                shadow: true,
+                store: store1,
+                axes: [{
+                    type: 'Numeric',
+                    position: 'bottom',
+                    fields: ['data1'],
+                    label: {
+                        renderer: Ext.util.Format.numberRenderer('0,0')
+                    },
+                    title: 'Precio',
+                    grid: true,
+                    minimum: 0
+                }, {
+                    type: 'Category',
+                    position: 'left',
+                    fields: ['name'],
+                    title: 'Entidad'
+                }],
+                theme: 'White',
+                background: {
+                    gradient: {
+                        id: 'backgroundGradient',
+                        angle: 45,
+                        stops: {
+                            0: {
+                                color: '#ffffff'
+                            },
+                            100: {
+                                color: '#eaf1f8'
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    type: 'bar',
+                    axis: 'bottom',
+                    highlight: true,
+                    tips: {
+                        trackMouse: true,
+                        width: 140,
+                        height: 28,
+                        renderer: function (storeItem, item) {
+                            this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data1') + ' views');
+                        }
+                    },
+                    label: {
+                        display: 'insideEnd',
+                        field: 'data1',
+                        renderer: Ext.util.Format.numberRenderer('0'),
+                        orientation: 'horizontal',
+                        color: '#333',
+                        'text-anchor': 'middle'
+                    },
+                    xField: 'name',
+                    yField: ['data1']
+                }]
+            }
+        });
+    });
+
+</script>
+
+<h2>Top</h2>
+
+ <div style="margin: 10px;">
+        <p>
+            Display a sets of random data in a bar series. Reload data will randomly generate a new set of data in the store. <a href="Bar.js">View Source</a>
+
+        </p>
+    </div>
